@@ -7,6 +7,7 @@ import configuration from './config/configuration';
 import { AuthModule } from './auth/auth.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
+import { EventModule } from './event/event.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { DataSource } from 'typeorm';
     }),
     UserModule,
     AuthModule,
+    EventModule,
   ],
   controllers: [AppController],
   providers: [AppService],

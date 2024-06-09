@@ -1,20 +1,18 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
 import { Photo } from 'src/database/entities/photo.entity';
 import { User } from 'src/database/entities/user.entity';
-import { DataSource, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
-
     @InjectRepository(Photo)
     private photosRepository: Repository<Photo>,
-    @InjectDataSource()
-    private dataSource: DataSource,
+
     private readonly jwtService: JwtService,
   ) {}
   async kakaoValidateUser(profile: {
@@ -51,25 +49,33 @@ export class AuthService {
     return { accessToken };
   }
 
-  async validateUser(userId: number): Promise<User> {
+  async validateUser(userId: number): Promise<{
+    id: number;
+    name: string;
+    profileImage: string;
+  }> {
     const user = await this.usersRepository
       .createQueryBuilder('user')
       .where('user.id = :userId', { userId })
       .select(['user.id', 'user.name'])
-      .leftJoinAndMapOne(
-        'user.photo',
+      .addSelect('photo.path', 'photo_path')
+      .leftJoin(
         'photo',
         'photo',
         'photo.entityId = user.id AND photo.entityType = :entityType',
         { entityType: 'user' },
       )
-      .getOne();
+      .getRawOne();
 
     if (!user) {
       throw new Error('User not found');
     }
 
-    return user;
+    return {
+      id: user.user_id,
+      name: user.user_name,
+      profileImage: user.photo_path,
+    };
   }
 
   generateAccessToken(user: User): string {

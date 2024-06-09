@@ -1,4 +1,6 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Like } from './like.entity';
+import { Event } from './event.entity';
 
 @Entity()
 export class User {
@@ -31,4 +33,10 @@ export class User {
     nullable: true,
   })
   socialProvider: 'kakao' | 'google';
+
+  @OneToMany(() => Like, (like) => like.user)
+  likes: Like[];
+
+  @OneToMany(() => Event, (event) => event.user)
+  events: Event[];
 }

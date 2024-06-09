@@ -1,5 +1,7 @@
-import { Column, Entity } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { CommonEntity } from './common/common.entity';
+import { User } from './user.entity';
+import { Like } from './like.entity';
 
 @Entity()
 export class Event extends CommonEntity {
@@ -14,6 +16,10 @@ export class Event extends CommonEntity {
     length: 255,
   })
   description: string;
+
+  @ManyToOne(() => User)
+  @JoinColumn({ name: 'userId' })
+  user: User;
 
   @Column({
     type: 'boolean',
@@ -45,15 +51,6 @@ export class Event extends CommonEntity {
   })
   addressOfplace: string;
 
-  @Column({
-    type: 'integer',
-    default: 0,
-  })
-  likeCount: number;
-
-  @Column({
-    type: 'integer',
-    default: 0,
-  })
-  dislikeCount: number;
+  @OneToMany(() => Like, (like) => like.event)
+  likes: Like[];
 }

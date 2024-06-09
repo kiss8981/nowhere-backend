@@ -1,6 +1,6 @@
 export default () => ({
   database: {
-    host: process.env.DB_HOST,
+    host: process.env.DB_HOST || 'localhost',
     port: parseInt(process.env.DB_PORT, 10) || 5432,
     username: process.env.DB_USERNAME || 'postgres',
     password: process.env.DB_PASSWORD || 'admin',
@@ -21,6 +21,6 @@ export default () => ({
   settings: {
     clientUrl: process.env.CLIENT_URL || 'http://localhost:3000',
     backendUrl: process.env.BACKEND_URL || 'http://localhost:3001',
-    port: parseInt(process.env.PORT, 10) || 3000,
+    port: parseInt(process.env.PORT, 10) || 3001,
   },
 });
