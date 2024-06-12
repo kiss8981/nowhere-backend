@@ -17,7 +17,9 @@ export class EventService {
     private photosRepository: Repository<Photo>,
     @InjectRepository(Event)
     private eventRepository: Repository<Event>,
-  ) {}
+  ) {
+    this.eventGateway.eventService = this;
+  }
 
   async create(userId: number, event: EventDto) {
     const user = await this.usersRepository.findOne({
@@ -36,11 +38,12 @@ export class EventService {
     newEvent.addressOfplace = event.addressOfplace;
     newEvent.user = user;
     const savedEvent = await this.eventRepository.save(newEvent);
-
     this.eventGateway.emitEvent('CREATE_EVENT', {
+      id: savedEvent.id,
       title: savedEvent.title,
       description: savedEvent.description,
       isAnonymous: savedEvent.isAnonymous,
+      createdAt: savedEvent.createdAt,
       user: {
         name: savedEvent.isAnonymous ? '익명' : user.name || '익명',
       },
@@ -53,5 +56,37 @@ export class EventService {
     });
 
     return savedEvent;
+  }
+
+  async getEvents(limit: number = 10, after: number = 0) {
+    const events = await this.eventRepository.find({
+      relations: {
+        user: true,
+      },
+      order: {
+        createdAt: 'DESC',
+      },
+      take: limit,
+      skip: after,
+    });
+
+    return events.map((event) => {
+      return {
+        id: event.id,
+        title: event.title,
+        description: event.description,
+        isAnonymous: event.isAnonymous,
+        user: {
+          name: event.isAnonymous ? '익명' : event.user.name || '익명',
+        },
+        location: {
+          latitude: event.latitude,
+          longitude: event.longitude,
+          address: event.address || null,
+          addressOfplace: event.addressOfplace || null,
+        },
+        createdAt: event.createdAt,
+      };
+    });
   }
 }

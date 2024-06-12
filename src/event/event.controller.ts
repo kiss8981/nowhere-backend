@@ -1,4 +1,12 @@
-import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Query,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { EventService } from './event.service';
 import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
@@ -12,5 +20,13 @@ export class EventController {
   @UseGuards(AuthGuard('jwt'))
   async create(@Req() req: Request, @Body() event: EventDto) {
     return this.eventService.create(req.user.userId, event);
+  }
+
+  @Get()
+  async getEvents(
+    @Query('limit') limit: number,
+    @Query('after') after: number,
+  ) {
+    return this.eventService.getEvents(limit, after);
   }
 }

@@ -8,6 +8,7 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { SOCKET_RESPONSE_PARAMS } from 'src/utils/constant';
+import { EventService } from './event.service';
 
 @WebSocketGateway()
 export class EventGateway
@@ -16,6 +17,7 @@ export class EventGateway
   constructor() {}
 
   @WebSocketServer() server: Server;
+  public eventService: EventService;
   private logger: Logger = new Logger(EventGateway.name);
 
   afterInit() {
@@ -28,6 +30,11 @@ export class EventGateway
 
   handleConnection(client: Socket) {
     this.logger.log(`Client Connected : ${client.id}`);
+
+    (async () => {
+      const events = await this.eventService.getEvents();
+      this.emitEvent('LAST_EVENTS', events);
+    })();
   }
 
   emitEvent<T extends keyof SOCKET_RESPONSE_PARAMS>(

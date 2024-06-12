@@ -10,6 +10,6 @@ import { EventGateway } from './event.gateway';
 @Module({
   imports: [TypeOrmModule.forFeature([User, Photo, Event])],
   controllers: [EventController],
-  providers: [EventService, EventGateway],
+  providers: [EventGateway, EventService],
 })
 export class EventModule {}

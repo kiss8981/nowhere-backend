@@ -5,6 +5,7 @@ export class EventDto {
   title: string;
 
   @IsString({ message: '이슈 내용을 입력해주세요.' })
+  @IsOptional()
   description: string;
 
   @IsBoolean({ message: '익명 여부를 선택해주세요.' })
